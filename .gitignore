@@ -6,3 +6,4 @@ db.sqlite3
 human_study_visualizations_adgan/
 human_study_visualizations_gfla/
 *.pkl
+.ipynb_checkpoints
