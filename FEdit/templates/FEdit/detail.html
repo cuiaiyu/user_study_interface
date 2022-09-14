@@ -1,0 +1,127 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Let's Quiz | Home {% endblock title %}
+{% block content %}
+<div class='center'>
+
+{% if question.question_cata == 'viton' %}
+    <h1>[Virtual Try-On] Question {{ count }} / {{ total }}</h1>
+{% else %}
+    <h1>[Pose Transfer] Question {{ count }} / {{ total }}</h1>
+{% endif %}
+
+{% if error_message %}<p style='color:red'><strong>{{ error_message }}</strong></p>{% endif %}
+
+
+<form action="{% url 'FEdit:vote' question.id %}" method="post">
+    {% csrf_token %}
+    
+        {% if question.question_type == 'real/fake' %}
+            
+                <h4> #{{ count }}: {{ question.question_text }}  </h4>
+                <p>You will have ONE SECOND to choose. When you are ready, chick the button to display images.</p>
+        <table>
+            <tr>
+                <td style='text-align:center'><button onclick="this.disabled=true; hideImage('q{{ question.id }}A'); hideImage('q{{ question.id }}B');">Ready to see images</button></td>
+                {% for choice in question.choice_set.all %}
+                <td style='text-align:center'> 
+                    <img id='q{{ question.id }}{{ choice.choice_text }}', src="{% static choice.query_image %}" height=256 width=176 style="visibility: hidden;" /> </br>
+                    <input type="radio" name="{{ question.id }}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+                </td>
+                {% endfor %}
+            </tr>
+        </table>
+        {% elif question.question_type == 'conditional real/fake' %}
+        
+            <p>---</p>   
+            <table  class='center'><tr>
+                <td>
+                    <p style='font-size: large;'' ><strong>WANT</strong></p>
+                <p style='font-size: large;'><strong> The <strong style='color:brown'>person (left)</strong>
+                {% if question.question_cata == 'viton' %}
+                      wearing the given <strong style='color:brown'> upper-clothes (right)</strong>.
+                {% else %}
+                      in the given <strong style='color:brown'> pose (right)</strong>.
+                {% endif %}
+                </strong></p>
+                <p style='text-align:center'><img src="{% static question.question_ref_image %}" /></p>
+                <p style='text-align:center'>
+                    <table class='center'><tr>
+                            <td class='center' width=176><i>ref. person</i></td>
+                            {% if question.question_cata == 'viton' %}
+                                <td class='center' width=176><i>ref. Upper-Clothes</i> </td>
+                            {% else %}
+                                <td class='center' width=176><i>ref. pose</i> </td>
+                            {% endif %}
+                            <input type="hidden" name="cata" value="{{ question.question_cata }}" />
+                    </tr></table>
+                </p></td>
+            <td> === generate ===></td>
+            <td><table class='center'><tr>
+                <p style='font-size: large;'' ><strong>Question</strong></p>
+
+                <p style='text-align: left; font-size:large'><strong>Which one looks more <strong style='color:brown'>realistic</strong> and <strong style='color:brown'>accurate</strong>?</strong> <br>
+                 - <u>Realistic</u>: looks real <br>
+                    - <u>Accurate</u>: preserves more details from references</p>
+                    
+                {% for choice in question.choice_set.all %}
+                <td class='center' width=200> <div class='container'>
+                    <label for="choice{{ forloop.counter }}"><img class='image' style="cursor:pointer" id='q{{ question.id }}{{ choice.choice_text }}', src="{% static choice.query_image %}" height=256 width=176 /> </label></br>
+               
+                    <input type="radio" name="{{ question.id }}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                    
+                    <label for="choice{{ forloop.counter }}">Generated {{ choice.choice_text }}</label>
+                </div></td>
+                {% endfor %}
+            </tr></table> </td>
+        </tr></table>
+        <div style="margin-left:20%; margin-right:20%;  background-color:rgb(205, 218, 184);text-align: left"><ol>
+                <li>please select the <strong>relatively</strong> more realistic and more accurate one, if both nonperfect. </li>
+         </ol></div>
+    
+        {% else %}
+            <tr>
+                <h4> #{{ count }}: {{ question.question_text }}  </h4>
+                <p>You will have ONE SECOND to choose. When you are ready, chick the button to display images. </p>
+            </tr>
+            <tr>
+                <td style='text-align:center'>
+                    
+                    <img id='q{{ question.id }}' src="{% static question.question_ref_image %}" height=256 width=176 style="visibility: hidden;"/> 
+                    <p style='text-align: center;'><button onclick="this.disabled=true; hideImage('q{{ question.id }}');">Ready to see images</button></p>
+                </td>
+                {% for choice in question.choice_set.all %}
+                <td style='text-align:center'> 
+                    <input type="radio" name="{{ question.id }}" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                    {% if choice.choice_text == 'A' %}<label for="choice{{ forloop.counter }}">Real</label>{% endif %}
+                    {% if choice.choice_text == 'B' %}<label for="choice{{ forloop.counter }}">Fake</label>{% endif %}
+                    <br>
+                </td>
+                {% endfor %}
+            </tr>
+        {% endif %}
+    </table> 
+</br>
+    <input type="hidden" name="count" value="{{ count }}" />
+    <input type="hidden" name="time_id" value="{{ time_id }}" />
+
+    <input type="hidden" name="total" value="{{ total }}" />    
+    <input class="button" type="submit" value="Vote and go to next question">
+</form>
+
+
+</div>
+
+<script type="text/javascript">
+	function hideImage(pic_id){
+		//  1000 = 5 seconds
+        // display the image
+        document.getElementById(pic_id).style.visibility="visible";
+        // hide the image
+		setTimeout(function(){document.getElementById(pic_id).style.visibility="hidden";}, 1000 );
+	}
+</script>
+
+{% endblock content %}

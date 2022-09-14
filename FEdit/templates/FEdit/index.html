@@ -1,0 +1,78 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Survey | Home {% endblock title %}
+{% block content %}
+<style>
+table
+{
+    table-layout: fixed;
+    width: 80%;
+}
+</style>
+<div class='center' style="margin-top:2%;margin-left:5%;margin-right:5%; ">
+<h1>Welcome to this Survey!</h1>
+<hr>
+
+{% if cata == '' %}
+<div class='center' style="margin-left:5%; margin-right:5%; background-color:rgb(205, 218, 184);">
+    Hi,The study is finished for the time being. Thank you for your interest! :)
+    </div>
+
+{% else %}
+<h3>Goal</h3>
+<p>We would like you to help evaluate the <strong>quality</strong> of generated images in terms of <strong>realism</strong> and <strong>accurateness</strong>. </p>
+<div class='center' style="margin-left:5%; margin-right:5%; background-color:rgb(205, 218, 184);">
+<ul>
+    <li><strong>Realistic</strong>: The generated images look like real images.</li>
+    <li><strong>Accurate</strong>: The generated images recontruct the reference images (if given) accurately.</li>
+</ul>
+</div>
+
+<h3>Task and Instruction</h3>
+{% if cata == 'viton' %}
+    <p>In this Survey, The task we assigned to you is <strong>Virtual Try-On</strong>. Please read the instruction below. 
+    <div style="margin-left:5%; margin-right:5%; padding:1%; background-color: rgb(219, 210, 198);border-radius: 10px;">
+            <h4>Virtual Try-On</h4> 
+                <p style='text-align: left;'>Given a <strong>target person</strong> and a <strong>target upper-clothes</strong>, 
+                which generated image has better quality, in terms of generating <u>the person in the given clothes</u>?</p>
+                <img class='center' src="{% static 'viton_instruction.png' %}" height=300 />
+           
+    <p style='text-align: left;'>Note</p>
+    <ol style='text-align: left;'>
+        <li>Only the <strong>Upper-clothes</strong> are supposed to be changed, the other garments of the ref. person should stay the same. </li>  
+        <li>If both generated images look bad, you can select the one  <strong>relatively</strong> more real and more realistic. </li>
+        <li>In very rare cases, If both generateds are <strong>completely failures</strong>, you can select "Both Unrecognizable", which will be given in the following survey. </li>
+        <li>Note, you are not asked to choose the “perfect” results, but the “better” results.</li>
+    </ol>
+    </div>
+
+{% else %}
+    <p>In this Survey, The task we assigned to you is <strong>Pose Transfer </strong>. Please read the instruction below. 
+    <div style="margin-left:5%; margin-right:5%; padding:1%; background-color: rgb(219, 210, 198);border-radius: 10px;">
+                <h4>Pose Transfer</h4> 
+                        <p>Given a <strong>target person</strong> and a <strong>target pose</strong>, 
+                            which of the given generated images has better quality, in terms of reconstructing <u>the person in the same outfits but in the given pose</u>?</li></p>
+                       
+                        <img class='center' src="{% static 'pose_instruction.png' %}" height=300 />
+                        <p style='text-align: left;'>Note</p>
+    <ol style='text-align: left;'>
+        <li>If both generated image candidates look unreal or not realistic, you can select the one which looks <strong>relatively</strong> more real and more realistic. </li>
+        <li>In very rare cases, If both generated image candidates are <strong>completely failures</strong>, you can select the additional option "Both Unrecognizable", which will be given in the following survey. </li>
+        <li>Note, you are not asked to choose the “perfect” results, but the “better” results, if there is a comparison.</li>
+    </ol>
+    </div>
+{% endif %}
+<input type="hidden" name="total" value="{{ total }}" />
+<hr>
+<p>Ready to start? Please consent the statement and start. </p>
+    <form method='post'>
+        {% csrf_token %}
+    <input class='button' type="submit" value="Start Survey!" />
+    </form>
+</div></div>
+
+
+
+{% endif %}
+{% endblock content %}

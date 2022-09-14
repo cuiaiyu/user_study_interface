@@ -1,0 +1,8 @@
+static/
+migrations/
+db.sqlite3
+*cache*
+*.pyc
+human_study_visualizations_adgan/
+human_study_visualizations_gfla/
+*.pkl
